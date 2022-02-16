@@ -41,14 +41,13 @@
 #include <Arduino.h>
 // #include <M5Stack.h>
 
-const uint32_t STATE_MACHINE_INTERVAL = 1000; // must be equal or larger than the sum of all delays!
+const uint32_t STATE_MACHINE_INTERVAL = 5000; // must be equal or larger than the sum of all delays!
 
-const uint32_t DELAY_AFTER_STATE_1 = 100;
-const uint32_t DELAY_AFTER_STATE_2 = 50;
-const uint32_t DELAY_AFTER_STATE_3 = 50;
-const uint32_t DELAY_AFTER_STATE_4 = 200;
-const uint32_t DELAY_AFTER_STATE_5 = 200;
-const uint32_t DELAY_AFTER_STATE_6 = 50;
+const uint32_t DELAY_STATE_1 = 200;
+const uint32_t DELAY_STATE_2 = 1000;
+const uint32_t DELAY_STATE_3 = 1000;
+const uint32_t DELAY_STATE_4 = 200;
+const uint32_t DELAY_STATE_5 = 200;
 
 enum STATES // different tasks in the state machine
 {
@@ -57,7 +56,7 @@ enum STATES // different tasks in the state machine
   READ_SENSOR_3,
   READ_SENSOR_4,
   READ_SENSOR_5,
-  READ_SENSOR_6,
+
   LAST_TASK
 };
 
@@ -150,9 +149,9 @@ void NonBlockingStateMachine()
     Serial.printf("StateNo:%2i delay: %lu\n", READ_SENSOR_1, millis() - STATE_START_DELAY);
     STATE_START_DELAY = millis(); // put some blocking code always AFTER this line
 
-    delay(33); // simulates some blocking code
+    delay(333); // simulates some blocking code
 
-    STATE_WAIT_DELAY = DELAY_AFTER_STATE_1; // for the next DELAY_AFTER_STATE_1, this function will return on entry.
+    STATE_WAIT_DELAY = DELAY_STATE_1; // for the next DELAY_STATE_1, this function will return on entry.
     STATE_NR++;                             // when the switch-case runs again it will be the next case that runs
     break;                                  // exit switch-case
 
@@ -160,9 +159,9 @@ void NonBlockingStateMachine()
     Serial.printf("StateNo:%2i delay: %lu\n", READ_SENSOR_2, millis() - STATE_START_DELAY);
     STATE_START_DELAY = millis();
 
-    delay(170); // If blocking code tooks longer than DELAY_AFTER_STATE_2,
+    delay(1001); // If blocking code tooks longer than DELAY_STATE_2,
 
-    STATE_WAIT_DELAY = DELAY_AFTER_STATE_2;
+    STATE_WAIT_DELAY = DELAY_STATE_2;
     STATE_NR++;
     break;
 
@@ -170,7 +169,9 @@ void NonBlockingStateMachine()
     Serial.printf("StateNo:%2i delay: %lu\n", READ_SENSOR_3, millis() - STATE_START_DELAY);
     STATE_START_DELAY = millis();
 
-    STATE_WAIT_DELAY = DELAY_AFTER_STATE_3;
+   delay(1002); // simulates some blocking code
+
+    STATE_WAIT_DELAY = DELAY_STATE_3;
     STATE_NR++;
     break;
 
@@ -178,9 +179,9 @@ void NonBlockingStateMachine()
     Serial.printf("StateNo:%2i delay: %lu\n", READ_SENSOR_4, millis() - STATE_START_DELAY);
     STATE_START_DELAY = millis();
 
-    delay(55); // more blocking code
+    delay(199); // more blocking code
 
-    STATE_WAIT_DELAY = DELAY_AFTER_STATE_4;
+    STATE_WAIT_DELAY = DELAY_STATE_4;
     STATE_NR++;
     break;
 
@@ -188,17 +189,19 @@ void NonBlockingStateMachine()
     Serial.printf("StateNo:%2i delay: %lu\n", READ_SENSOR_5, millis() - STATE_START_DELAY);
     STATE_START_DELAY = millis();
 
-    STATE_WAIT_DELAY = DELAY_AFTER_STATE_5;
+   delay(33); // simulates some blocking code
+
+    STATE_WAIT_DELAY = DELAY_STATE_5;
     STATE_NR++;
     break;
 
-  case READ_SENSOR_6:
-    Serial.printf("StateNo:%2i delay: %lu\n", READ_SENSOR_6, millis() - STATE_START_DELAY);
-    STATE_START_DELAY = millis();
+  // case READ_SENSOR_6:
+  //   Serial.printf("StateNo:%2i delay: %lu\n", READ_SENSOR_6, millis() - STATE_START_DELAY);
+  //   STATE_START_DELAY = millis();
 
-    STATE_WAIT_DELAY = DELAY_AFTER_STATE_6;
-    STATE_NR++;
-    break;
+  //   STATE_WAIT_DELAY = DELAY_STATE_6;
+  //   STATE_NR++;
+  //   break;
 
   case LAST_TASK:                                       // fill up the gap between runntime and looptime if necessary
     STATE_MACHINE_END = millis() - STATE_MACHINE_START; // calculate running time of state machine
@@ -229,4 +232,5 @@ void loop()
 {
   NonBlockingStateMachine();
   // NonBlockingDummyDelay();
+  // delay(100); // INFO no delay() is allowed here!
 }
